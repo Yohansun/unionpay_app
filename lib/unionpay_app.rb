@@ -1,6 +1,6 @@
 require 'unionpay_app/service'
 
-module AlipayMobile
+module UnionpayApp
   class << self
     attr_accessor :front_url
     attr_accessor :back_url
