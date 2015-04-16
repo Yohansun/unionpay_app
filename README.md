@@ -5,13 +5,15 @@
 Installation
 ------
 
-Add this line to your application's Gemfile:
-
+######Add this line to your application's Gemfile:
+```ruby
 gem 'unionpay_app', '~> 0.7.0'
-or development version
-
+```
+######or development version
+```ruby
 $ bundle
-Usage
+```
+######Usage
 
 Config
 ------
