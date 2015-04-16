@@ -1,3 +1,9 @@
+require 'digest'
+require 'openssl'
+require "base64"
+require 'open-uri'
+require 'typhoeus'
+
 module UnionpayApp
   module Service
   	#银联支付签名
@@ -22,13 +28,17 @@ module UnionpayApp
 	    }
 	    data = Digest::SHA1.hexdigest(union_params.sort.map{|key, value| "#{key}=#{value}" }.join('&'))
 	    sign = Base64.encode64(OpenSSL::PKey::RSA.new(UnionpayApp.private_key).sign('sha1', data.force_encoding("utf-8"))).gsub("\n", "")
-	    union_params.merge(signature: sign)
+	    {time: union_params[:txnTime], sign: union_params.merge(signature: sign)}
 	  end
 
 	  def self.post union_params
-	  	request = Typhoeus::Request.new(UnionpayApp.uri, method: :post, params: union_params, ssl_verifypeer: false, headers: {'Content-Type' =>'application/x-www-form-urlencoded'} )
+	  	request = Typhoeus::Request.new(UnionpayApp.uri, method: :post, params: union_params[:sign], ssl_verifypeer: false, headers: {'Content-Type' =>'application/x-www-form-urlencoded'} )
       request.run
-      tn = Hash[*request.response.body.split("&").map{|a| a.gsub("==", "@@").split("=")}.flatten]['tn']
+      if request.response.success?
+      	tn = Hash[*request.response.body.split("&").map{|a| a.gsub("==", "@@").split("=")}.flatten]['tn']
+      else
+      	tn = ""
+      end
 	  end
 
 	  #银联支付验签
@@ -53,7 +63,7 @@ module UnionpayApp
 			certificate.serial.to_s == cert_id ? certificate.public_key.to_s : nil #php 返回的直接是cer文件 UnionpayApp.cer
 		end
 
-		def self.query order_id
+		def self.query order_id, txnTime
 			union_params = {
 				:version => '5.0.0',		#版本号
 				:encoding => 'utf-8',		#编码方式
@@ -66,7 +76,7 @@ module UnionpayApp
 				:channelType => '07',		#渠道类型
 				:orderId => order_id,	#请修改被查询的交易的订单号
 				:merId => UnionpayApp.mer_id,	#商户代码，请修改为自己的商户号
-				:txnTime => order_id,	#请修改被查询的交易的订单发送时间
+				:txnTime => txnTime,	#请修改被查询的交易的订单发送时间
 			}
 			data = Digest::SHA1.hexdigest(union_params.sort.map{|key, value| "#{key}=#{value}" }.join('&'))
 	    sign = Base64.encode64(OpenSSL::PKey::RSA.new(UnionpayApp.private_key).sign('sha1', data.force_encoding("utf-8"))).gsub("\n", "")
