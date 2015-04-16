@@ -80,7 +80,7 @@ module UnionpayApp
 			}
 			data = Digest::SHA1.hexdigest(union_params.sort.map{|key, value| "#{key}=#{value}" }.join('&'))
 	    sign = Base64.encode64(OpenSSL::PKey::RSA.new(UnionpayApp.private_key).sign('sha1', data.force_encoding("utf-8"))).gsub("\n", "")
-	    request = Typhoeus::Request.new(UnionpayApp.uri, method: :post, params: union_params.merge(signature: sign), ssl_verifypeer: false, headers: {'Content-Type' =>'application/x-www-form-urlencoded'} )
+	    request = Typhoeus::Request.new(UnionpayApp.query_uri, method: :post, params: union_params.merge(signature: sign), ssl_verifypeer: false, headers: {'Content-Type' =>'application/x-www-form-urlencoded'} )
 	    request.run
 	    if request.response.success?
 	    	code = Hash[*request.response.body.split("&").map{|a| a.gsub("==", "@@").split("=")}.flatten]['origRespCode']

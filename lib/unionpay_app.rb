@@ -9,5 +9,6 @@ module UnionpayApp
     attr_accessor :private_key
     attr_accessor :cer
     attr_accessor :cert_id
+    attr_accessor :query_uri
   end
 end
