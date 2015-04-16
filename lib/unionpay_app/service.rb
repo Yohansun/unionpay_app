@@ -35,16 +35,16 @@ module UnionpayApp
     	request = Typhoeus::Request.new(UnionpayApp.uri, method: :post, params: union_params[:sign], ssl_verifypeer: false, headers: {'Content-Type' =>'application/x-www-form-urlencoded'} )
       request.run
       if request.response.success?
-      	tn = Hash[*request.response.body.split("&").map{|a| a.gsub("==", "@@").split("=")}.flatten]['tn']
+        tn = Hash[*request.response.body.split("&").map{|a| a.gsub("==", "@@").split("=")}.flatten]['tn']
       else
-      	tn = ""
+        tn = ""
       end
     end
 
     #银联支付验签
     def self.verify params
     	if unionpay_get_public_key_by_cert_id params['certId']
-    		public_key = unionpay_get_public_key_by_cert_id params['certId']
+        public_key = unionpay_get_public_key_by_cert_id params['certId']
         signature_str = params['signature']
         p = params.reject{|k, v| k == "signature"}.sort.map{|key, value| "#{key}=#{value}" }.join('&')
         signature = Base64.decode64(signature_str)
@@ -53,7 +53,7 @@ module UnionpayApp
         digest = OpenSSL::Digest::SHA256.new
         key.verify digest, signature, data
     	else
-    		false
+        false
     	end
     end
 
@@ -65,25 +65,25 @@ module UnionpayApp
 
     def self.query order_id, txnTime
     	union_params = {
-    		:version => '5.0.0',		#版本号
-    		:encoding => 'utf-8',		#编码方式
-    		:certId => UnionpayApp.cert_id,	#证书ID	
-    		:signMethod => '01',		#签名方法
-    		:txnType => '00',		#交易类型	
-    		:txnSubType => '00',		#交易子类
-    		:bizType => '000000',		#业务类型
-    		:accessType => '0',		#接入类型
-    		:channelType => '07',		#渠道类型
-    		:orderId => order_id,	#请修改被查询的交易的订单号
-    		:merId => UnionpayApp.mer_id,	#商户代码，请修改为自己的商户号
-    		:txnTime => txnTime,	#请修改被查询的交易的订单发送时间
+        :version => '5.0.0',		#版本号
+        :encoding => 'utf-8',		#编码方式
+        :certId => UnionpayApp.cert_id,	#证书ID	
+        :signMethod => '01',		#签名方法
+        :txnType => '00',		#交易类型	
+        :txnSubType => '00',		#交易子类
+        :bizType => '000000',		#业务类型
+        :accessType => '0',		#接入类型
+        :channelType => '07',		#渠道类型
+        :orderId => order_id,	#请修改被查询的交易的订单号
+        :merId => UnionpayApp.mer_id,	#商户代码，请修改为自己的商户号
+        :txnTime => txnTime,	#请修改被查询的交易的订单发送时间
     	}
     	data = Digest::SHA1.hexdigest(union_params.sort.map{|key, value| "#{key}=#{value}" }.join('&'))
       sign = Base64.encode64(OpenSSL::PKey::RSA.new(UnionpayApp.private_key).sign('sha1', data.force_encoding("utf-8"))).gsub("\n", "")
       request = Typhoeus::Request.new(UnionpayApp.query_uri, method: :post, params: union_params.merge(signature: sign), ssl_verifypeer: false, headers: {'Content-Type' =>'application/x-www-form-urlencoded'} )
       request.run
       if request.response.success?
-      	code = Hash[*request.response.body.split("&").map{|a| a.gsub("==", "@@").split("=")}.flatten]['origRespCode']
+        code = Hash[*request.response.body.split("&").map{|a| a.gsub("==", "@@").split("=")}.flatten]['origRespCode']
       elsif request.response.timed_out?
         code = "got a time out"
       elsif request.response.code == 0
