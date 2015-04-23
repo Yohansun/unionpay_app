@@ -43,8 +43,8 @@ module UnionpayApp
 
     #银联支付验签
     def self.verify params
-    	if unionpay_get_public_key_by_cert_id params['certId']
-        public_key = unionpay_get_public_key_by_cert_id params['certId']
+    	if get_public_key_by_cert_id params['certId']
+        public_key = get_public_key_by_cert_id params['certId']
         signature_str = params['signature']
         p = params.reject{|k, v| k == "signature"}.sort.map{|key, value| "#{key}=#{value}" }.join('&')
         signature = Base64.decode64(signature_str)
