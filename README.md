@@ -22,6 +22,7 @@ UnionpayApp.front_url = Settings.union.frontUrl
 UnionpayApp.back_url = Settings.union.backUrl
 UnionpayApp.mer_id = Settings.union.merId
 UnionpayApp.uri = Settings.union.uri
+UnionpayApp.query_uri = Settings.union.query_uri
 UnionpayApp.private_key = Settings.union.private_key
 UnionpayApp.cer = Settings.union.cer
 UnionpayApp.cert_id = Settings.union.certId
