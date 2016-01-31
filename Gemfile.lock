@@ -1,16 +1,16 @@
 PATH
   remote: .
   specs:
-    unionpay_app (0.1.0)
+    unionpay_app (0.9.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    ethon (0.7.3)
+    ethon (0.8.1)
       ffi (>= 1.3.0)
     fakeweb (1.3.0)
-    ffi (1.9.8)
-    rake (10.4.2)
+    ffi (1.9.10)
+    rake (10.5.0)
     typhoeus (0.6.9)
       ethon (>= 0.7.1)
 
